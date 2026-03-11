@@ -6,6 +6,7 @@ import type { Painting } from "../types/painting";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getPaintings } from "../api/paintings";
+import InquirySection from "../components/InquirySection";
 
 type HomePageProps = {
   onQuickView: (painting: Painting) => void;
@@ -44,6 +45,7 @@ export default function HomePage({ onQuickView, onAddToCart }: HomePageProps) {
       </section>
 
       <InstagramGallery />
+      <InquirySection />
     </>
   );
 }

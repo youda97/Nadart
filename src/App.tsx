@@ -9,7 +9,10 @@ import CartPage from "./pages/CartPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
+import InquirySuccessPage from "./pages/InquirySuccessPage";
+import NotFoundPage from "./pages/NotFoundPage";
 import ScrollToTop from "./components/ScrollToTop";
+import AppErrorBoundary from "./components/AppErrorBoundary";
 import type { Painting } from "./types/painting";
 
 const CART_STORAGE_KEY = "nadart-cart";
@@ -101,11 +104,13 @@ function AppContent() {
             path="checkout/success"
             element={<CheckoutSuccessPage clearCart={clearCart} />}
           />
+          <Route path="inquiry-success" element={<InquirySuccessPage />} />
           <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
           <Route
             path="terms-and-conditions"
             element={<TermsAndConditionsPage />}
           />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
 
@@ -135,7 +140,9 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <AppErrorBoundary>
+        <AppContent />
+      </AppErrorBoundary>
     </BrowserRouter>
   );
 }
