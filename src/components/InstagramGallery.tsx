@@ -1,24 +1,67 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Instagram } from "lucide-react";
 import { getLatestInstagramPosts, type InstagramPost } from "../api/instagram";
 
 export default function InstagramGallery() {
   const [posts, setPosts] = useState<InstagramPost[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const sectionRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      getLatestInstagramPosts()
-        .then(setPosts)
-        .finally(() => setLoading(false));
-    }, 1500);
+    const node = sectionRef.current;
+    if (!node || hasLoaded) return;
 
-    return () => clearTimeout(timer);
-  }, []);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting) {
+          setShouldLoad(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "300px 0px" },
+    );
 
-  if (loading) {
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, [hasLoaded]);
+
+  useEffect(() => {
+    if (!shouldLoad || hasLoaded) return;
+
+    let cancelled = false;
+
+    async function loadPosts() {
+      try {
+        setLoading(true);
+        const data = await getLatestInstagramPosts();
+
+        if (!cancelled) {
+          setPosts(data);
+          setHasLoaded(true);
+        }
+      } catch (error) {
+        console.error("Failed to load Instagram posts:", error);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void loadPosts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [shouldLoad, hasLoaded]);
+
+  if (loading && posts.length === 0) {
     return (
-      <section className="relative overflow-hidden py-24">
+      <section ref={sectionRef} className="relative overflow-hidden py-24">
         <div className="absolute inset-0 bg-[url('/textures/content-bg.webp')] bg-cover bg-center opacity-90" />
         <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 sm:px-6 lg:grid-cols-[320px_1fr] lg:px-8">
           <div className="animate-pulse space-y-4">
@@ -32,8 +75,9 @@ export default function InstagramGallery() {
   }
 
   return (
-    <section className="relative overflow-hidden py-24">
-      <div className="absolute inset-0 bg-[url('/textures/content-bg.webp')] bg-cover bg-center bg-fixed opacity-90" />{" "}
+    <section ref={sectionRef} className="relative overflow-hidden py-24">
+      <div className="absolute inset-0 bg-[url('/textures/content-bg.webp')] bg-cover bg-center bg-fixed opacity-90" />
+
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 sm:px-6 lg:grid-cols-[320px_1fr] lg:px-8">
         <div>
           <div className="mb-6 flex items-center gap-4">
@@ -45,7 +89,7 @@ export default function InstagramGallery() {
 
           <div className="space-y-1">
             <p className="text-xl font-bold text-stone-900">Nadart</p>
-            <p className="text-md text-[#b99a64] italic">@nadart_815</p>
+            <p className="text-md italic text-[#b99a64]">@nadart_815</p>
             <p className="max-w-sm text-md leading-8 text-stone-700">
               Follow Nada’s Instagram for new paintings, work-in-progress posts,
               and featured Islamic canvas pieces.
@@ -75,7 +119,8 @@ export default function InstagramGallery() {
               <img
                 src={post.imageUrl}
                 alt={post.caption || "Instagram post"}
-                className="aspect-square w-full h-full object-cover transition duration-500 group-hover:scale-110"
+                loading="lazy"
+                className="aspect-square h-full w-full object-cover transition duration-500 group-hover:scale-110"
               />
 
               {/* overlay */}

@@ -8,7 +8,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import AppErrorBoundary from "./components/AppErrorBoundary";
 import type { Painting } from "./types/painting";
 
-const HomePage = lazy(() => import("./pages/HomePage"));
+import HomePage from "./pages/HomePage";
 const CollectionPage = lazy(() => import("./pages/CollectionPage"));
 const CartPage = lazy(() => import("./pages/CartPage"));
 const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
