@@ -4,8 +4,7 @@ import Hero from "../components/Hero";
 import InstagramGallery from "../components/InstagramGallery";
 import type { Painting } from "../types/painting";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { getPaintings } from "../api/paintings";
+import { paintings } from "../data/paintings";
 import InquirySection from "../components/InquirySection";
 
 type HomePageProps = {
@@ -15,11 +14,6 @@ type HomePageProps = {
 
 export default function HomePage({ onQuickView, onAddToCart }: HomePageProps) {
   const navigate = useNavigate();
-  const [paintings, setPaintings] = useState<Painting[]>([]);
-
-  useEffect(() => {
-    getPaintings().then(setPaintings);
-  }, []);
 
   const latest = paintings.slice(0, 3);
 

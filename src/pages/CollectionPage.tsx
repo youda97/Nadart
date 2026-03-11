@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import ShelfRow from "../components/ShelfRow";
 import PaintingCard from "../components/PaintingCard";
 import type { Painting } from "../types/painting";
-import { getPaintings } from "../api/paintings";
+import { paintings } from "../data/paintings";
 
 type CollectionPageProps = {
   onQuickView: (painting: Painting) => void;
@@ -14,12 +14,7 @@ export default function CollectionPage({
   onQuickView,
   onAddToCart,
 }: CollectionPageProps) {
-  const [paintings, setPaintings] = useState<Painting[]>([]);
   const [page, setPage] = useState(1);
-
-  useEffect(() => {
-    getPaintings().then(setPaintings);
-  }, []);
 
   const perPage = 9;
   const totalPages = Math.ceil(paintings.length / perPage);
@@ -27,7 +22,7 @@ export default function CollectionPage({
   const pageItems = useMemo(() => {
     const start = (page - 1) * perPage;
     return paintings.slice(start, start + perPage);
-  }, [page, paintings]);
+  }, [page]);
 
   const rows = useMemo(() => {
     const grouped: Painting[][] = [];
