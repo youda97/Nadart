@@ -16,7 +16,7 @@ export default function SectionTitle({
       className={`mb-8 flex items-center justify-between gap-4 ${className}`}
     >
       <div className="flex items-center gap-4">
-        <span className="h-[3px] w-10 bg-[#b99a64]" />
+        <span className="hidden sm:block h-[3px] w-10 bg-[#b99a64]" />
         <h2 className="text-xl font-bold tracking-tight text-stone-900 md:text-3xl">
           {title}
         </h2>

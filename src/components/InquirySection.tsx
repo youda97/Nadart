@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import SectionTitle from "./SectionTitle";
 
 export default function InquirySection() {
   const navigate = useNavigate();
@@ -43,12 +44,10 @@ export default function InquirySection() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 border border-[#d8c4a1] bg-white/80 p-8 shadow-[0_18px_40px_rgba(0,0,0,0.12)] backdrop-blur-sm lg:grid-cols-[0.95fr_1.05fr] lg:p-12">
           <div>
-            <div className="mb-6 flex items-center gap-4">
-              <span className="h-[3px] w-10 bg-[#b99a64]" />
-              <h2 className="text-xl font-bold tracking-tight text-stone-900 md:text-3xl">
-                Inquiries
-              </h2>
-            </div>
+            <SectionTitle
+              title="Inquiries"
+              className="mx-auto max-w-[1120px]"
+            />
 
             <p className="text-xl font-bold text-stone-900">Get in touch</p>
             <p className="mt-3 max-w-md text-base leading-8 text-stone-700">
