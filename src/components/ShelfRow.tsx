@@ -29,7 +29,7 @@ export default function ShelfRow({
 
       <div className="pointer-events-none relative mx-auto -mt-10 hidden h-28 w-full max-w-[1300px] lg:block">
         <img
-          src="/decor/wood-plank.png"
+          src="/decor/wood-plank.webp"
           alt="wood shelf"
           className="h-full w-full object-fill"
         />

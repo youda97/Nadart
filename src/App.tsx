@@ -23,7 +23,7 @@ const CART_STORAGE_KEY = "nadart-cart";
 
 export function PageLoader() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[url('/textures/content-bg.png')] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[url('/textures/content-bg.webp')] px-4">
       <div className="border border-[#d8c4a1] bg-white/80 px-8 py-6 text-center shadow-[0_18px_40px_rgba(0,0,0,0.12)] backdrop-blur-sm">
         <p className="text-xs uppercase tracking-[0.24em] text-[#b99a64]">
           Nadart

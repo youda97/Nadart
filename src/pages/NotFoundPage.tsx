@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function NotFoundPage() {
   return (
-    <section className="relative overflow-hidden bg-[url('/textures/content-bg.png')] pb-24 pt-[calc(77px+6rem)]">
+    <section className="relative overflow-hidden bg-[url('/textures/content-bg.webp')] pb-24 pt-[calc(77px+6rem)]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(199,155,78,0.18),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(168,121,55,0.14),_transparent_28%)]" />
 
       <div className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">

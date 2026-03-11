@@ -42,7 +42,7 @@ export default function QuickViewModal({
           {/* Shelf behind frame */}
           <div className="pointer-events-none absolute bottom-[20px] left-1/2 z-0 hidden w-[120%] -translate-x-1/2 lg:block">
             <img
-              src="/decor/wood-plank.png"
+              src="/decor/wood-plank.webp"
               alt="wood shelf"
               className="h-24 w-full object-fill"
             />

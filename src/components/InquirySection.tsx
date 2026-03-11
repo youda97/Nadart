@@ -37,7 +37,7 @@ export default function InquirySection() {
 
   return (
     <section className="relative overflow-hidden py-24">
-      <div className="absolute inset-0 bg-[url('/textures/content-bg.png')] bg-cover bg-center opacity-90" />
+      <div className="absolute inset-0 bg-[url('/textures/content-bg.webp')] bg-cover bg-center opacity-90" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(199,155,78,0.14),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(168,121,55,0.12),_transparent_28%)]" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
