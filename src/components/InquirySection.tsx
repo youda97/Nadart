@@ -114,17 +114,33 @@ export default function InquirySection() {
               >
                 Reason
               </label>
-              <select
-                id="reason"
-                name="reason"
-                defaultValue="General inquiry"
-                className="w-full border border-[#d8c4a1] bg-white px-4 py-3 text-stone-900 outline-none transition focus:border-[#b99a64]"
-              >
-                <option>General inquiry</option>
-                <option>Painting availability</option>
-                <option>Custom request</option>
-                <option>Shipping question</option>
-              </select>
+              <div className="relative">
+                <select
+                  name="reason"
+                  required
+                  className="w-full appearance-none border border-[#d8c4a1] bg-white px-4 py-3 pr-10 text-stone-800 focus:border-[#b99a64] focus:outline-none"
+                >
+                  <option>General inquiry</option>
+                  <option>Painting purchase</option>
+                  <option>Custom commission</option>
+                  <option>Other</option>
+                </select>
+
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#b99a64]">
+                  <svg
+                    className="h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+              </div>
             </div>
 
             <div>
