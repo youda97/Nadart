@@ -7,9 +7,13 @@ export default function InstagramGallery() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getLatestInstagramPosts()
-      .then(setPosts)
-      .finally(() => setLoading(false));
+    const timer = setTimeout(() => {
+      getLatestInstagramPosts()
+        .then(setPosts)
+        .finally(() => setLoading(false));
+    }, 1500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   if (loading) {

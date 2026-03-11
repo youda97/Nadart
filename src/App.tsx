@@ -1,21 +1,38 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+
 import MainLayout from "./layouts/MainLayout";
 import QuickViewModal from "./modals/QuickViewModal";
 import AddedToCartModal from "./modals/AddedToCartModal";
-import HomePage from "./pages/HomePage";
-import CollectionPage from "./pages/CollectionPage";
-import CartPage from "./pages/CartPage";
-import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
-import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
-import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
-import InquirySuccessPage from "./pages/InquirySuccessPage";
-import NotFoundPage from "./pages/NotFoundPage";
 import ScrollToTop from "./components/ScrollToTop";
 import AppErrorBoundary from "./components/AppErrorBoundary";
 import type { Painting } from "./types/painting";
 
+const HomePage = lazy(() => import("./pages/HomePage"));
+const CollectionPage = lazy(() => import("./pages/CollectionPage"));
+const CartPage = lazy(() => import("./pages/CartPage"));
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+const TermsAndConditionsPage = lazy(
+  () => import("./pages/TermsAndConditionsPage"),
+);
+const CheckoutSuccessPage = lazy(() => import("./pages/CheckoutSuccessPage"));
+const InquirySuccessPage = lazy(() => import("./pages/InquirySuccessPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
+
 const CART_STORAGE_KEY = "nadart-cart";
+
+export function PageLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[url('/textures/content-bg.png')] px-4">
+      <div className="border border-[#d8c4a1] bg-white/80 px-8 py-6 text-center shadow-[0_18px_40px_rgba(0,0,0,0.12)] backdrop-blur-sm">
+        <p className="text-xs uppercase tracking-[0.24em] text-[#b99a64]">
+          Nadart
+        </p>
+        <p className="mt-3 text-lg font-medium text-stone-800">Loading...</p>
+      </div>
+    </div>
+  );
+}
 
 function AppContent() {
   const navigate = useNavigate();
@@ -79,40 +96,42 @@ function AppContent() {
     <>
       <ScrollToTop />
 
-      <Routes>
-        <Route path="/" element={<MainLayout cartCount={cart.length} />}>
-          <Route
-            index
-            element={
-              <HomePage onQuickView={setQuickView} onAddToCart={addToCart} />
-            }
-          />
-          <Route
-            path="collection"
-            element={
-              <CollectionPage
-                onQuickView={setQuickView}
-                onAddToCart={addToCart}
-              />
-            }
-          />
-          <Route
-            path="cart"
-            element={<CartPage cart={cart} onRemove={removeFromCart} />}
-          />
-          <Route
-            path="checkout/success"
-            element={<CheckoutSuccessPage clearCart={clearCart} />}
-          />
-          <Route path="inquiry-success" element={<InquirySuccessPage />} />
-          <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
-          <Route
-            path="terms-and-conditions"
-            element={<TermsAndConditionsPage />}
-          />
-          <Route path="*" element={<NotFoundPage />} />
-        </Route>
-      </Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<MainLayout cartCount={cart.length} />}>
+            <Route
+              index
+              element={
+                <HomePage onQuickView={setQuickView} onAddToCart={addToCart} />
+              }
+            />
+            <Route
+              path="collection"
+              element={
+                <CollectionPage
+                  onQuickView={setQuickView}
+                  onAddToCart={addToCart}
+                />
+              }
+            />
+            <Route
+              path="cart"
+              element={<CartPage cart={cart} onRemove={removeFromCart} />}
+            />
+            <Route
+              path="checkout/success"
+              element={<CheckoutSuccessPage clearCart={clearCart} />}
+            />
+            <Route path="inquiry-success" element={<InquirySuccessPage />} />
+            <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route
+              path="terms-and-conditions"
+              element={<TermsAndConditionsPage />}
+            />
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+        </Routes>
+      </Suspense>
 
       {quickView ? (
         <QuickViewModal

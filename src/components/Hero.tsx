@@ -43,6 +43,8 @@ export default function Hero() {
             <div className="relative w-full">
               <img
                 src="/hero/hero-painting.webp"
+                fetchPriority="high"
+                loading="eager"
                 alt="Featured Nadart painting"
                 className="ml-auto h-[90vh] w-auto object-contain"
               />
