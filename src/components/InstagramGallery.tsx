@@ -1,0 +1,101 @@
+import { useEffect, useState } from "react";
+import { Instagram } from "lucide-react";
+import { getLatestInstagramPosts, type InstagramPost } from "../api/instagram";
+
+export default function InstagramGallery() {
+  const [posts, setPosts] = useState<InstagramPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getLatestInstagramPosts()
+      .then(setPosts)
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="relative overflow-hidden py-24">
+        <div className="absolute inset-0 bg-[url('/textures/content-bg.png')] bg-cover bg-center opacity-90" />
+        <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 sm:px-6 lg:grid-cols-[320px_1fr] lg:px-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-64 rounded-lg bg-stone-200" />
+            <div className="h-6 rounded-md bg-stone-200" />
+            <div className="h-6 rounded-md bg-stone-200" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="relative overflow-hidden py-24">
+      <div className="absolute inset-0 bg-[url('/textures/content-bg.png')] bg-cover bg-center bg-fixed opacity-90" />{" "}
+      <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 sm:px-6 lg:grid-cols-[320px_1fr] lg:px-8">
+        <div>
+          <div className="mb-6 flex items-center gap-4">
+            <span className="h-[3px] w-10 bg-[#b99a64]" />
+            <h2 className="text-xl font-bold tracking-tight text-stone-900 md:text-3xl">
+              Instagram Gallery
+            </h2>
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-xl font-bold text-stone-900">Nadart</p>
+            <p className="text-md text-[#b99a64] italic">@nadart_815</p>
+            <p className="max-w-sm text-md leading-8 text-stone-700">
+              Follow Nada’s Instagram for new paintings, work-in-progress posts,
+              and featured Islamic canvas pieces.
+            </p>
+          </div>
+
+          <a
+            href="https://www.instagram.com/nadart_815/"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-4 inline-flex items-center gap-3 bg-[#c9a56a] px-5 py-2 text-lg font-medium text-white transition hover:bg-[#b89255]"
+          >
+            <Instagram className="h-5 w-5" />
+            Follow us
+          </a>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => (
+            <a
+              key={post.id}
+              href={post.permalink}
+              target="_blank"
+              rel="noreferrer"
+              className="group relative overflow-hidden rounded-xl bg-white shadow-md transition hover:shadow-xl"
+            >
+              <img
+                src={post.imageUrl}
+                alt={post.caption || "Instagram post"}
+                className="aspect-square w-full h-full object-cover transition duration-500 group-hover:scale-110"
+              />
+
+              {/* overlay */}
+              <div className="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-100 transition duration-300 md:opacity-0 md:group-hover:opacity-100">
+                <div className="p-4 text-white">
+                  <p className="line-clamp-3 text-sm">{post.caption}</p>
+                </div>
+              </div>
+
+              {/* instagram icon */}
+              <div className="absolute right-3 top-3 rounded-full bg-black/50 p-2 text-white opacity-100 transition md:opacity-0 md:group-hover:opacity-100">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="h-4 w-4"
+                >
+                  <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 2A3.75 3.75 0 0 0 4 7.75v8.5A3.75 3.75 0 0 0 7.75 20h8.5A3.75 3.75 0 0 0 20 16.25v-8.5A3.75 3.75 0 0 0 16.25 4h-8.5zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.25-2.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z" />
+                </svg>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
