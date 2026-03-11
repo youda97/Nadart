@@ -15,7 +15,7 @@ export default function InstagramGallery() {
   if (loading) {
     return (
       <section className="relative overflow-hidden py-24">
-        <div className="absolute inset-0 bg-[url('/textures/content-bg.png')] bg-cover bg-center opacity-90" />
+        <div className="absolute inset-0 bg-[url('/textures/content-bg.webp')] bg-cover bg-center opacity-90" />
         <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 sm:px-6 lg:grid-cols-[320px_1fr] lg:px-8">
           <div className="animate-pulse space-y-4">
             <div className="h-64 rounded-lg bg-stone-200" />
@@ -29,7 +29,7 @@ export default function InstagramGallery() {
 
   return (
     <section className="relative overflow-hidden py-24">
-      <div className="absolute inset-0 bg-[url('/textures/content-bg.png')] bg-cover bg-center bg-fixed opacity-90" />{" "}
+      <div className="absolute inset-0 bg-[url('/textures/content-bg.webp')] bg-cover bg-center bg-fixed opacity-90" />{" "}
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 sm:px-6 lg:grid-cols-[320px_1fr] lg:px-8">
         <div>
           <div className="mb-6 flex items-center gap-4">

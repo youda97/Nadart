@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-[url('/textures/content-bg.png')] bg-cover bg-center pt-[77px]">
+    <section className="relative overflow-hidden bg-[url('/textures/content-bg.webp')] bg-cover bg-center pt-[77px]">
       {/* soft glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(199,155,78,0.16),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(168,121,55,0.14),_transparent_28%)]" />
 
@@ -42,7 +42,7 @@ export default function Hero() {
           <div className="relative hidden h-full items-center justify-end md:flex">
             <div className="relative w-full">
               <img
-                src="/hero/hero-painting.png"
+                src="/hero/hero-painting.webp"
                 alt="Featured Nadart painting"
                 className="ml-auto h-[90vh] w-auto object-contain"
               />

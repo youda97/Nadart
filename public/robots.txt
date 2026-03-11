@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nadart.ca/sitemap.xml

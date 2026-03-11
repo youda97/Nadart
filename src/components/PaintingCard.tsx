@@ -26,6 +26,7 @@ export default function PaintingCard({
         <div className="aspect-[4/5] bg-[#f4efea] p-6 sm:p-8">
           <img
             src={painting.image}
+            loading="lazy"
             alt={painting.title}
             className="h-full w-full object-cover"
           />
