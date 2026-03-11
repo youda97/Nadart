@@ -116,7 +116,7 @@ export default function InstagramGallery() {
     };
   }, [shouldLoad, hasLoaded]);
 
-  const showSkeleton = shouldLoad && posts.length === 0;
+  const showSkeleton = loading && posts.length === 0;
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden py-24">
