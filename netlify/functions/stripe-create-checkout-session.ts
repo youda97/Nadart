@@ -73,6 +73,10 @@ export const handler: Handler = async (event) => {
       shipping_address_collection: {
         allowed_countries: ['CA', 'US'],
       },
+      invoice_creation: {
+        enabled: true,
+      },
+      customer_creation: 'always',
       metadata: {
         source: 'nadart-site',
       },
