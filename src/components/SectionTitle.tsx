@@ -17,7 +17,11 @@ export default function SectionTitle({
     >
       <div className="flex items-center gap-4">
         <span className="hidden sm:block h-[3px] w-10 bg-[#b99a64]" />
-        <h2 className="text-xl font-bold tracking-tight text-stone-900 md:text-3xl">
+        <h2
+          className={`font-bold tracking-tight text-stone-900 md:text-3xl ${
+            action ? "text-xl" : "text-2xl"
+          }`}
+        >
           {title}
         </h2>
       </div>
