@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import ShelfRow from "../components/ShelfRow";
 import PaintingCard from "../components/PaintingCard";
@@ -7,7 +7,6 @@ import type { Painting } from "../types/painting";
 type CollectionPageProps = {
   onQuickView: (painting: Painting) => void;
   onAddToCart: (painting: Painting) => void;
-  refetchPaintings: () => void;
   paintings: Painting[];
   paintingsLoading: boolean;
 };
@@ -15,7 +14,6 @@ type CollectionPageProps = {
 export default function CollectionPage({
   onQuickView,
   onAddToCart,
-  refetchPaintings,
   paintings,
   paintingsLoading,
 }: CollectionPageProps) {
@@ -23,10 +21,6 @@ export default function CollectionPage({
 
   const perPage = 9;
   const totalPages = Math.ceil(paintings.length / perPage);
-
-  useEffect(() => {
-    refetchPaintings();
-  }, [refetchPaintings]);
 
   const pageItems = useMemo(() => {
     const start = (page - 1) * perPage;
@@ -42,10 +36,7 @@ export default function CollectionPage({
   }, [pageItems]);
 
   const loadingPlaceholders = useMemo(
-    () =>
-      Array.from({ length: 3 }, (_, index) => ({
-        id: `loading-${index}`,
-      })),
+    () => Array.from({ length: 3 }, (_, index) => `loading-${index}`),
     [],
   );
 
@@ -75,17 +66,17 @@ export default function CollectionPage({
             <>
               <div className="hidden lg:block">
                 <ShelfRow
-                  isLoading
                   items={[]}
                   onQuickView={onQuickView}
                   onAddToCart={onAddToCart}
+                  isLoading
                 />
               </div>
 
               <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:hidden">
-                {loadingPlaceholders.map((item) => (
+                {loadingPlaceholders.map((key) => (
                   <PaintingCard
-                    key={item.id}
+                    key={key}
                     isLoading
                     onQuickView={onQuickView}
                     onAddToCart={onAddToCart}
@@ -96,23 +87,27 @@ export default function CollectionPage({
           ) : (
             <>
               <div className="hidden lg:block">
-                {rows.map((row, index) => (
+                {rows.map((row, rowIndex) => (
                   <ShelfRow
-                    key={index}
+                    key={rowIndex}
                     items={row}
                     onQuickView={onQuickView}
                     onAddToCart={onAddToCart}
+                    getPriorityForIndex={(itemIndex) =>
+                      page === 1 && rowIndex === 0 && itemIndex === 0
+                    }
                   />
                 ))}
               </div>
 
               <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:hidden">
-                {pageItems.map((painting) => (
+                {pageItems.map((painting, index) => (
                   <PaintingCard
                     key={painting.id}
                     painting={painting}
                     onQuickView={onQuickView}
                     onAddToCart={onAddToCart}
+                    priority={page === 1 && index === 0}
                   />
                 ))}
               </div>

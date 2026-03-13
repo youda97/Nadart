@@ -7,6 +7,7 @@ type ShelfRowProps = {
   onAddToCart: (painting: Painting) => void;
   shelfClassName?: string;
   isLoading?: boolean;
+  getPriorityForIndex?: (index: number) => boolean;
 };
 
 export default function ShelfRow({
@@ -15,29 +16,29 @@ export default function ShelfRow({
   onAddToCart,
   shelfClassName = "",
   isLoading = false,
+  getPriorityForIndex,
 }: ShelfRowProps) {
-  const loadingItems = Array.from({ length: 3 }, (_, index) => ({
-    id: `loading-shelf-${index}`,
-  }));
+  const loadingItems = Array.from({ length: 3 }, (_, index) => index);
 
   return (
     <div className={`relative mb-10 ${shelfClassName}`}>
       <div className="relative z-10 mx-auto grid max-w-[1120px] grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-10">
         {isLoading
-          ? loadingItems.map((item) => (
+          ? loadingItems.map((index) => (
               <PaintingCard
-                key={item.id}
+                key={`loading-shelf-${index}`}
                 isLoading
                 onQuickView={onQuickView}
                 onAddToCart={onAddToCart}
               />
             ))
-          : items.map((painting) => (
+          : items.map((painting, index) => (
               <PaintingCard
                 key={painting.id}
                 painting={painting}
                 onQuickView={onQuickView}
                 onAddToCart={onAddToCart}
+                priority={getPriorityForIndex?.(index) ?? false}
               />
             ))}
       </div>

@@ -59,9 +59,13 @@ function AppContent() {
   const fetchPaintings = useCallback(async () => {
     try {
       setPaintingsLoading(true);
+
       const res = await fetch("/api/paintings");
       const data = await res.json();
+
       setPaintings(data);
+    } catch (error) {
+      console.error("Failed to fetch paintings:", error);
     } finally {
       setPaintingsLoading(false);
     }
@@ -124,7 +128,6 @@ function AppContent() {
                   onAddToCart={addToCart}
                   paintings={paintings}
                   paintingsLoading={paintingsLoading}
-                  refetchPaintings={fetchPaintings}
                 />
               }
             />
@@ -136,7 +139,6 @@ function AppContent() {
                   onAddToCart={addToCart}
                   paintings={paintings}
                   paintingsLoading={paintingsLoading}
-                  refetchPaintings={fetchPaintings}
                 />
               }
             />

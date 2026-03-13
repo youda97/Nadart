@@ -8,6 +8,7 @@ type PaintingCardProps = {
   onAddToCart: (painting: Painting) => void;
   painting?: Painting;
   isLoading?: boolean;
+  priority?: boolean;
 };
 
 export default function PaintingCard({
@@ -15,8 +16,9 @@ export default function PaintingCard({
   onAddToCart,
   painting,
   isLoading = false,
+  priority = false,
 }: PaintingCardProps) {
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(() => !painting?.image);
 
   if (isLoading || !painting) {
     return (
@@ -61,8 +63,9 @@ export default function PaintingCard({
 
           <img
             src={painting.image}
-            loading="lazy"
             alt={painting.title}
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
             onLoad={() => setImageLoaded(true)}
             className={`h-full w-full object-cover transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"

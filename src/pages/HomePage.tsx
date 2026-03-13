@@ -6,12 +6,10 @@ import type { Painting } from "../types/painting";
 import { useNavigate } from "react-router-dom";
 import InquirySection from "../components/InquirySection";
 import { Helmet } from "react-helmet-async";
-import { useEffect } from "react";
 
 type HomePageProps = {
   onQuickView: (painting: Painting) => void;
   onAddToCart: (painting: Painting) => void;
-  refetchPaintings: () => void;
   paintings: Painting[];
   paintingsLoading: boolean;
 };
@@ -19,17 +17,12 @@ type HomePageProps = {
 export default function HomePage({
   onQuickView,
   onAddToCart,
-  refetchPaintings,
   paintings,
   paintingsLoading,
 }: HomePageProps) {
   const navigate = useNavigate();
 
   const latest = paintings.slice(0, 3);
-
-  useEffect(() => {
-    refetchPaintings();
-  }, [refetchPaintings]);
 
   return (
     <>
