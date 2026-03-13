@@ -31,8 +31,10 @@ export async function createCheckoutSession(
   });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Checkout failed: ${text}`);
+    const error = await response.json();
+    throw new Error(
+      `Checkout failed: ${error || error.error || "Unknown error"}`,
+    );
   }
 
   return response.json() as Promise<{ url: string; id: string }>;

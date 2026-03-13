@@ -47,7 +47,7 @@ export const handler: Handler = async (event) => {
     const now = new Date();
     const nowIso = now.toISOString();
 
-    const reserveUntil = new Date(now.getTime() + 15 * 60 * 1000).toISOString();
+    const reserveUntil = new Date(now.getTime() + 30 * 60 * 1000).toISOString();
 
     const reservationToken = crypto.randomUUID();
 
