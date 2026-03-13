@@ -7,15 +7,17 @@ import type { Painting } from "../types/painting";
 type CollectionPageProps = {
   onQuickView: (painting: Painting) => void;
   onAddToCart: (painting: Painting) => void;
-  paintings: Painting[];
   refetchPaintings: () => void;
+  paintings: Painting[];
+  paintingsLoading: boolean;
 };
 
 export default function CollectionPage({
   onQuickView,
   onAddToCart,
-  paintings,
   refetchPaintings,
+  paintings,
+  paintingsLoading,
 }: CollectionPageProps) {
   const [page, setPage] = useState(1);
 
@@ -24,7 +26,7 @@ export default function CollectionPage({
 
   useEffect(() => {
     refetchPaintings();
-  }, []);
+  }, [refetchPaintings]);
 
   const pageItems = useMemo(() => {
     const start = (page - 1) * perPage;
@@ -38,6 +40,14 @@ export default function CollectionPage({
     }
     return grouped;
   }, [pageItems]);
+
+  const loadingPlaceholders = useMemo(
+    () =>
+      Array.from({ length: 3 }, (_, index) => ({
+        id: `loading-${index}`,
+      })),
+    [],
+  );
 
   return (
     <div className="min-h-screen bg-[#f6f6f4] pt-19">
@@ -61,61 +71,89 @@ export default function CollectionPage({
             </div>
           </div>
 
-          <div className="hidden lg:block">
-            {rows.map((row, index) => (
-              <ShelfRow
-                key={index}
-                items={row}
-                onQuickView={onQuickView}
-                onAddToCart={onAddToCart}
-              />
-            ))}
-          </div>
+          {paintingsLoading ? (
+            <>
+              <div className="hidden lg:block">
+                <ShelfRow
+                  isLoading
+                  items={[]}
+                  onQuickView={onQuickView}
+                  onAddToCart={onAddToCart}
+                />
+              </div>
 
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:hidden">
-            {pageItems.map((painting) => (
-              <PaintingCard
-                key={painting.id}
-                painting={painting}
-                onQuickView={onQuickView}
-                onAddToCart={onAddToCart}
-              />
-            ))}
-          </div>
+              <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:hidden">
+                {loadingPlaceholders.map((item) => (
+                  <PaintingCard
+                    key={item.id}
+                    isLoading
+                    onQuickView={onQuickView}
+                    onAddToCart={onAddToCart}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="hidden lg:block">
+                {rows.map((row, index) => (
+                  <ShelfRow
+                    key={index}
+                    items={row}
+                    onQuickView={onQuickView}
+                    onAddToCart={onAddToCart}
+                  />
+                ))}
+              </div>
 
-          <div className="mt-10 flex items-center justify-center gap-2">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="h-8 w-8 bg-[#b99a64] text-white disabled:opacity-40"
-              disabled={page === 1}
-            >
-              ‹
-            </button>
+              <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:hidden">
+                {pageItems.map((painting) => (
+                  <PaintingCard
+                    key={painting.id}
+                    painting={painting}
+                    onQuickView={onQuickView}
+                    onAddToCart={onAddToCart}
+                  />
+                ))}
+              </div>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-              (pageNum) => (
-                <button
-                  key={pageNum}
-                  onClick={() => setPage(pageNum)}
-                  className={`h-8 w-8 border text-sm ${
-                    page === pageNum
-                      ? "border-[#b99a64] bg-white text-stone-900"
-                      : "border-stone-300 bg-white text-stone-500"
-                  }`}
-                >
-                  {pageNum}
-                </button>
-              ),
-            )}
+              {totalPages > 1 ? (
+                <div className="mt-10 flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    className="h-8 w-8 bg-[#b99a64] text-white disabled:opacity-40"
+                    disabled={page === 1}
+                  >
+                    ‹
+                  </button>
 
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              className="h-8 w-8 bg-[#b99a64] text-white disabled:opacity-40"
-              disabled={page === totalPages}
-            >
-              ›
-            </button>
-          </div>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (pageNum) => (
+                      <button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        className={`h-8 w-8 border text-sm ${
+                          page === pageNum
+                            ? "border-[#b99a64] bg-white text-stone-900"
+                            : "border-stone-300 bg-white text-stone-500"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ),
+                  )}
+
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    className="h-8 w-8 bg-[#b99a64] text-white disabled:opacity-40"
+                    disabled={page === totalPages}
+                  >
+                    ›
+                  </button>
+                </div>
+              ) : null}
+            </>
+          )}
         </div>
       </section>
     </div>

@@ -18,7 +18,7 @@ export default function CheckoutSuccessPage({
 
   useEffect(() => {
     refetchPaintings();
-  }, []);
+  }, [refetchPaintings]);
 
   useEffect(() => {
     if (hasClearedRef.current) return;

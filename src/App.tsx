@@ -54,20 +54,22 @@ function AppContent() {
   const [quickView, setQuickView] = useState<Painting | null>(null);
   const [addedToCartItem, setAddedToCartItem] = useState<Painting | null>(null);
   const [paintings, setPaintings] = useState<Painting[]>([]);
+  const [paintingsLoading, setPaintingsLoading] = useState(true);
 
   const fetchPaintings = useCallback(async () => {
-    const res = await fetch("/api/paintings");
-    const data = await res.json();
-    setPaintings(data);
-  }, []);
-
-  useEffect(() => {
-    (async () => {
+    try {
+      setPaintingsLoading(true);
       const res = await fetch("/api/paintings");
       const data = await res.json();
       setPaintings(data);
-    })();
+    } finally {
+      setPaintingsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchPaintings();
+  }, [fetchPaintings]);
 
   useEffect(() => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
@@ -121,6 +123,8 @@ function AppContent() {
                   onQuickView={setQuickView}
                   onAddToCart={addToCart}
                   paintings={paintings}
+                  paintingsLoading={paintingsLoading}
+                  refetchPaintings={fetchPaintings}
                 />
               }
             />
@@ -131,6 +135,7 @@ function AppContent() {
                   onQuickView={setQuickView}
                   onAddToCart={addToCart}
                   paintings={paintings}
+                  paintingsLoading={paintingsLoading}
                   refetchPaintings={fetchPaintings}
                 />
               }

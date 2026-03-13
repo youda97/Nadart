@@ -46,7 +46,7 @@ export default function CartPage({
 
   useEffect(() => {
     refetchPaintings();
-  }, []);
+  }, [refetchPaintings]);
 
   useEffect(() => {
     fetch("https://ipapi.co/json/")

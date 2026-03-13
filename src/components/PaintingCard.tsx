@@ -1,18 +1,45 @@
+import { useState } from "react";
 import { ShoppingCart, Search } from "lucide-react";
 import { formatPrice } from "../lib/format";
 import type { Painting } from "../types/painting";
 
 type PaintingCardProps = {
-  painting: Painting;
   onQuickView: (painting: Painting) => void;
   onAddToCart: (painting: Painting) => void;
+  painting?: Painting;
+  isLoading?: boolean;
 };
 
 export default function PaintingCard({
-  painting,
   onQuickView,
   onAddToCart,
+  painting,
+  isLoading = false,
 }: PaintingCardProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  if (isLoading || !painting) {
+    return (
+      <div className="group relative mx-auto w-full max-w-[340px] animate-pulse">
+        <div className="relative z-10 overflow-visible border-[18px] border-black bg-[#f0e9e3] shadow-[0_12px_28px_rgba(0,0,0,0.18)]">
+          <div className="aspect-[4/5] bg-[#f4efea] p-6 sm:p-8">
+            <div className="h-full w-full bg-stone-200" />
+          </div>
+        </div>
+
+        <div className="bg-transparent px-2 pb-2 pt-6 text-center lg:hidden">
+          <div className="mx-auto h-7 w-40 bg-stone-200" />
+          <div className="mx-auto mt-4 h-8 w-28 bg-stone-200" />
+
+          <div className="mt-7 flex items-center justify-center gap-4">
+            <div className="h-16 w-16 bg-stone-200" />
+            <div className="h-16 w-16 bg-stone-200" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="group relative mx-auto w-full max-w-[340px]">
       {/* Frame */}
@@ -26,12 +53,20 @@ export default function PaintingCard({
             Reserved <br /> (Someone is checking out)
           </div>
         ) : null}
-        <div className="aspect-[4/5] bg-[#f4efea] p-6 sm:p-8">
+
+        <div className="relative aspect-[4/5] bg-[#f4efea] p-6 sm:p-8">
+          {!imageLoaded ? (
+            <div className="absolute inset-6 animate-pulse bg-stone-200 sm:inset-8" />
+          ) : null}
+
           <img
             src={painting.image}
             loading="lazy"
             alt={painting.title}
-            className="h-full w-full object-cover"
+            onLoad={() => setImageLoaded(true)}
+            className={`h-full w-full object-cover transition-opacity duration-300 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
           />
         </div>
       </div>

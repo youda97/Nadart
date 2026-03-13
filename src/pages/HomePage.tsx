@@ -5,24 +5,49 @@ import InstagramGallery from "../components/InstagramGallery";
 import type { Painting } from "../types/painting";
 import { useNavigate } from "react-router-dom";
 import InquirySection from "../components/InquirySection";
+import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 
 type HomePageProps = {
   onQuickView: (painting: Painting) => void;
   onAddToCart: (painting: Painting) => void;
+  refetchPaintings: () => void;
   paintings: Painting[];
+  paintingsLoading: boolean;
 };
 
 export default function HomePage({
   onQuickView,
   onAddToCart,
+  refetchPaintings,
   paintings,
+  paintingsLoading,
 }: HomePageProps) {
   const navigate = useNavigate();
 
   const latest = paintings.slice(0, 3);
 
+  useEffect(() => {
+    refetchPaintings();
+  }, [refetchPaintings]);
+
   return (
     <>
+      <Helmet>
+        <link
+          rel="preload"
+          as="image"
+          href="/hero/hero-painting.webp"
+          fetchPriority="high"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/textures/content-bg.webp"
+          fetchPriority="high"
+        />
+      </Helmet>
+
       <Hero />
 
       <section className="bg-[#f6f6f4] py-24">
@@ -38,6 +63,7 @@ export default function HomePage({
             items={latest}
             onQuickView={onQuickView}
             onAddToCart={onAddToCart}
+            isLoading={paintingsLoading}
           />
         </div>
       </section>
