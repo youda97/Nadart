@@ -2,11 +2,13 @@ export type Painting = {
   id: string;
   title: string;
   price: number;
-  oldPrice?: number;
-  size: string;
+  old_price?: number;
   image: string;
-  featured?: boolean;
-  inStock: boolean;
+  size_width: number;
+  size_height: number;
   category?: string;
   sold: boolean;
+  reserved_until?: string | null;
+  isReserved: boolean;
+  created_at: string;
 };

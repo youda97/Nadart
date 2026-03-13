@@ -53,6 +53,21 @@ function AppContent() {
 
   const [quickView, setQuickView] = useState<Painting | null>(null);
   const [addedToCartItem, setAddedToCartItem] = useState<Painting | null>(null);
+  const [paintings, setPaintings] = useState<Painting[]>([]);
+
+  const fetchPaintings = useCallback(async () => {
+    const res = await fetch("/api/paintings");
+    const data = await res.json();
+    setPaintings(data);
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("/api/paintings");
+      const data = await res.json();
+      setPaintings(data);
+    })();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
@@ -102,7 +117,11 @@ function AppContent() {
             <Route
               index
               element={
-                <HomePage onQuickView={setQuickView} onAddToCart={addToCart} />
+                <HomePage
+                  onQuickView={setQuickView}
+                  onAddToCart={addToCart}
+                  paintings={paintings}
+                />
               }
             />
             <Route
@@ -111,16 +130,29 @@ function AppContent() {
                 <CollectionPage
                   onQuickView={setQuickView}
                   onAddToCart={addToCart}
+                  paintings={paintings}
+                  refetchPaintings={fetchPaintings}
                 />
               }
             />
             <Route
               path="cart"
-              element={<CartPage cart={cart} onRemove={removeFromCart} />}
+              element={
+                <CartPage
+                  cart={cart}
+                  onRemove={removeFromCart}
+                  refetchPaintings={fetchPaintings}
+                />
+              }
             />
             <Route
               path="checkout/success"
-              element={<CheckoutSuccessPage clearCart={clearCart} />}
+              element={
+                <CheckoutSuccessPage
+                  clearCart={clearCart}
+                  refetchPaintings={fetchPaintings}
+                />
+              }
             />
             <Route path="inquiry-success" element={<InquirySuccessPage />} />
             <Route path="privacy-policy" element={<PrivacyPolicyPage />} />

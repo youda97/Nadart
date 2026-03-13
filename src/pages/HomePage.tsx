@@ -4,15 +4,19 @@ import Hero from "../components/Hero";
 import InstagramGallery from "../components/InstagramGallery";
 import type { Painting } from "../types/painting";
 import { useNavigate } from "react-router-dom";
-import { paintings } from "../data/paintings";
 import InquirySection from "../components/InquirySection";
 
 type HomePageProps = {
   onQuickView: (painting: Painting) => void;
   onAddToCart: (painting: Painting) => void;
+  paintings: Painting[];
 };
 
-export default function HomePage({ onQuickView, onAddToCart }: HomePageProps) {
+export default function HomePage({
+  onQuickView,
+  onAddToCart,
+  paintings,
+}: HomePageProps) {
   const navigate = useNavigate();
 
   const latest = paintings.slice(0, 3);

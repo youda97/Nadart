@@ -4,15 +4,21 @@ import { useEffect, useRef } from "react";
 
 type CheckoutSuccessPageProps = {
   clearCart: () => void;
+  refetchPaintings: () => void;
 };
 
 export default function CheckoutSuccessPage({
   clearCart,
+  refetchPaintings,
 }: CheckoutSuccessPageProps) {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
 
   const hasClearedRef = useRef(false);
+
+  useEffect(() => {
+    refetchPaintings();
+  }, []);
 
   useEffect(() => {
     if (hasClearedRef.current) return;

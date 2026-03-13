@@ -5,7 +5,10 @@ type CheckoutCartItem = {
   quantity: number;
 };
 
-export async function createCheckoutSession(cart: Painting[]) {
+export async function createCheckoutSession(
+  cart: Painting[],
+  shippingCountry: "CA" | "US",
+) {
   const grouped = new Map<string, number>();
 
   for (const item of cart) {
@@ -16,7 +19,7 @@ export async function createCheckoutSession(cart: Painting[]) {
     ([productId, quantity]) => ({
       productId,
       quantity,
-    })
+    }),
   );
 
   const response = await fetch("/api/stripe-create-checkout-session", {
@@ -24,7 +27,7 @@ export async function createCheckoutSession(cart: Painting[]) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ items }),
+    body: JSON.stringify({ items, shippingCountry }),
   });
 
   if (!response.ok) {

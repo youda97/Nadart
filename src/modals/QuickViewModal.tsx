@@ -68,9 +68,9 @@ export default function QuickViewModal({
             </h3>
 
             <div className="mt-4 flex flex-wrap items-center gap-4 text-2xl font-bold sm:text-3xl">
-              {painting.oldPrice ? (
+              {painting.old_price ? (
                 <span className="text-white/80 line-through">
-                  {formatPrice(painting.oldPrice)}
+                  {formatPrice(painting.old_price)}
                 </span>
               ) : null}
               <span>{formatPrice(painting.price)}</span>
@@ -78,7 +78,9 @@ export default function QuickViewModal({
 
             <div className="mt-8 flex items-center gap-3 text-lg sm:text-xl">
               <span className="font-semibold">Size:</span>
-              <span className="text-white/95">{painting.size}</span>
+              <span className="text-white/95">
+                {painting.size_width} x {painting.size_height} inches
+              </span>
             </div>
 
             {painting.sold ? (
