@@ -1,4 +1,5 @@
 /api/stripe-create-checkout-session         /.netlify/functions/stripe-create-checkout-session          200
+/api/release-reservation                    /.netlify/functions/release-reservation                     200
 /api/instagram-latest                       /.netlify/functions/instagram-latest                        200
 /api/paintings                              /.netlify/functions/paintings                               200
 /*                                          /index.html                                                 200
