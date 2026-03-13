@@ -186,13 +186,33 @@ export const handler: Handler = async (event) => {
      * Replace reservation token with actual Stripe session id
      */
 
-    await supabase
+    const { data: swappedRows, error: swapError } = await supabase
       .from("paintings")
       .update({
         reserved_session_id: session.id,
       })
       .in("id", ids)
-      .eq("reserved_session_id", reservationToken);
+      .eq("reserved_session_id", reservationToken)
+      .select("id, reserved_session_id");
+
+    if (swapError) {
+      console.error(
+        "Failed to replace reservation token with Stripe session id",
+        {
+          reservationToken,
+          stripeSessionId: session.id,
+          swapError,
+        },
+      );
+
+      throw new Error(swapError.message);
+    }
+
+    console.log("Reservation token swapped to Stripe session id", {
+      reservationToken,
+      stripeSessionId: session.id,
+      swappedRows,
+    });
 
     return {
       statusCode: 200,

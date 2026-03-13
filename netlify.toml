@@ -6,6 +6,9 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
+[functions.cleanup-expired-reservations]
+  schedule = "*/10 * * * *"
+  
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"

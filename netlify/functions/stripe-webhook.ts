@@ -129,18 +129,33 @@ export const handler: Handler = async (event) => {
         });
 
         if (paintingIds.length > 0) {
-          const { error: releaseError } = await supabase
+          const { data: releasedRows, error: releaseError } = await supabase
             .from("paintings")
             .update({
               reserved_until: null,
               reserved_session_id: null,
             })
             .in("id", paintingIds)
-            .eq("reserved_session_id", session.id);
+            .eq("reserved_session_id", session.id)
+            .select("id, reserved_session_id, reserved_until");
+
+          console.log("Expired checkout release result", {
+            sessionId: session.id,
+            paintingIds,
+            releasedRows,
+            releaseError,
+          });
 
           if (releaseError) {
             console.error("Reservation release failed:", releaseError);
             throw new Error(releaseError.message);
+          }
+
+          if (!releasedRows || releasedRows.length === 0) {
+            console.warn("No paintings were released for expired session", {
+              sessionId: session.id,
+              paintingIds,
+            });
           }
         }
 
