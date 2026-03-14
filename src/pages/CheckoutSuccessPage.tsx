@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
-import { trackEvent } from "../lib/plausible";
 
 type CheckoutSuccessPageProps = {
   clearCart: () => void;
@@ -26,12 +25,6 @@ export default function CheckoutSuccessPage({
     clearCart();
     hasClearedRef.current = true;
   }, [clearCart]);
-
-  useEffect(() => {
-    trackEvent("Purchase", {
-      sessionId: sessionId || "unknown",
-    });
-  }, [sessionId]);
 
   return (
     <div className="min-h-screen bg-[#f8f3eb] pt-28">

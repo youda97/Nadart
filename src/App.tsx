@@ -6,7 +6,6 @@ import QuickViewModal from "./modals/QuickViewModal";
 import AddedToCartModal from "./modals/AddedToCartModal";
 import ScrollToTop from "./components/ScrollToTop";
 import AppErrorBoundary from "./components/AppErrorBoundary";
-import PlausiblePageview from "./components/PlausiblePageview";
 import type { Painting } from "./types/painting";
 
 import HomePage from "./pages/HomePage";
@@ -19,8 +18,6 @@ const TermsAndConditionsPage = lazy(
 const CheckoutSuccessPage = lazy(() => import("./pages/CheckoutSuccessPage"));
 const InquirySuccessPage = lazy(() => import("./pages/InquirySuccessPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
-
-import { trackEvent } from "./lib/plausible";
 
 const CART_STORAGE_KEY = "nadart-cart";
 
@@ -59,16 +56,6 @@ function AppContent() {
   const [paintings, setPaintings] = useState<Painting[]>([]);
   const [paintingsLoading, setPaintingsLoading] = useState(true);
 
-  const handleQuickView = (painting: Painting) => {
-    trackEvent("QuickViewOpen", {
-      paintingId: painting.id,
-      title: painting.title,
-      category: painting.category || "uncategorized",
-    });
-
-    setQuickView(painting);
-  };
-
   const fetchPaintings = useCallback(async () => {
     try {
       setPaintingsLoading(true);
@@ -97,26 +84,13 @@ function AppContent() {
       return;
     }
 
-    let wasAdded = false;
-
     setCart((prev) => {
       const alreadyInCart = prev.some((item) => item.id === painting.id);
       if (alreadyInCart) {
         return prev;
       }
-
-      wasAdded = true;
       return [...prev, painting];
     });
-
-    if (wasAdded) {
-      trackEvent("AddToCart", {
-        paintingId: painting.id,
-        title: painting.title,
-        category: painting.category || "uncategorized",
-        price: painting.price,
-      });
-    }
 
     setQuickView(null);
     setAddedToCartItem(painting);
@@ -141,7 +115,6 @@ function AppContent() {
 
   return (
     <>
-      <PlausiblePageview />
       <ScrollToTop />
 
       <Suspense fallback={<PageLoader />}>
@@ -151,7 +124,7 @@ function AppContent() {
               index
               element={
                 <HomePage
-                  onQuickView={handleQuickView}
+                  onQuickView={setQuickView}
                   onAddToCart={addToCart}
                   paintings={paintings}
                   paintingsLoading={paintingsLoading}
@@ -162,7 +135,7 @@ function AppContent() {
               path="collection"
               element={
                 <CollectionPage
-                  onQuickView={handleQuickView}
+                  onQuickView={setQuickView}
                   onAddToCart={addToCart}
                   paintings={paintings}
                   paintingsLoading={paintingsLoading}
