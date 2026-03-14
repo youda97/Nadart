@@ -1,21 +1,19 @@
 import { useRef, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { formatPrice } from "../lib/format";
+import { trackEvent, paintingToGAItem } from "../lib/ga";
+import { usePaintings } from "../hooks/usePaintings";
 import type { Painting } from "../types/painting";
 import { createCheckoutSession } from "../api/checkout";
-import { trackEvent, paintingToGAItem } from "../lib/ga";
 
 type CartPageProps = {
   cart: Painting[];
   onRemove: (id: string) => void;
-  refetchPaintings: () => void;
 };
 
-export default function CartPage({
-  cart,
-  onRemove,
-  refetchPaintings,
-}: CartPageProps) {
+export default function CartPage({ cart, onRemove }: CartPageProps) {
+  const { refetchPaintings } = usePaintings();
+
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [shippingCountry, setShippingCountry] = useState<"CA" | "US">("CA");
@@ -24,8 +22,10 @@ export default function CartPage({
   const total = cart.reduce((sum, item) => sum + item.price, 0);
   const wasCancelled = searchParams.get("cancelled") === "true";
   const hasUnavailableItems = cart.some((item) => item.sold || item.isReserved);
+
   const hasReleasedRef = useRef(false);
   const hasTrackedViewCartRef = useRef(false);
+  const hasTrackedCancelledRef = useRef(false);
 
   async function handleCheckout() {
     try {
@@ -41,7 +41,6 @@ export default function CartPage({
 
       // store session id
       localStorage.setItem("checkout_session_id", session.id);
-
       window.location.href = session.url;
     } catch (error) {
       setCheckoutError(
@@ -69,14 +68,15 @@ export default function CartPage({
   }, [cart, total]);
 
   useEffect(() => {
-    fetch("https://ipapi.co/json/")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.country === "US") {
-          setShippingCountry("US");
-        }
-      });
-  }, []);
+    if (!wasCancelled || hasTrackedCancelledRef.current) return;
+
+    trackEvent("refund", {
+      currency: "CAD",
+      value: total,
+    });
+
+    hasTrackedCancelledRef.current = true;
+  }, [wasCancelled, total]);
 
   useEffect(() => {
     if (!wasCancelled || hasReleasedRef.current) return;
@@ -94,12 +94,24 @@ export default function CartPage({
       body: JSON.stringify({
         sessionId,
       }),
-    }).catch((error) => {
-      console.error("Failed to release reservation", error);
-    });
+    })
+      .then(() => refetchPaintings())
+      .catch((error) => {
+        console.error("Failed to release reservation", error);
+      });
 
     localStorage.removeItem("checkout_session_id");
-  }, [wasCancelled]);
+  }, [wasCancelled, refetchPaintings]);
+
+  useEffect(() => {
+    fetch("https://ipapi.co/json/")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.country === "US") {
+          setShippingCountry("US");
+        }
+      });
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#f6f6f4] pt-28">

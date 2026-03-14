@@ -6,21 +6,16 @@ import type { Painting } from "../types/painting";
 import { useNavigate } from "react-router-dom";
 import InquirySection from "../components/InquirySection";
 import { Helmet } from "react-helmet-async";
+import { usePaintings } from "../hooks/usePaintings";
 
 type HomePageProps = {
   onQuickView: (painting: Painting) => void;
   onAddToCart: (painting: Painting) => void;
-  paintings: Painting[];
-  paintingsLoading: boolean;
 };
 
-export default function HomePage({
-  onQuickView,
-  onAddToCart,
-  paintings,
-  paintingsLoading,
-}: HomePageProps) {
+export default function HomePage({ onQuickView, onAddToCart }: HomePageProps) {
   const navigate = useNavigate();
+  const { paintings, paintingsLoading } = usePaintings();
 
   const latest = paintings.slice(0, 3);
 

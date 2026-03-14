@@ -2,16 +2,16 @@ import { useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 import { trackEvent } from "../lib/ga";
+import { usePaintings } from "../hooks/usePaintings";
 
 type CheckoutSuccessPageProps = {
   clearCart: () => void;
-  refetchPaintings: () => void;
 };
 
 export default function CheckoutSuccessPage({
   clearCart,
-  refetchPaintings,
 }: CheckoutSuccessPageProps) {
+  const { refetchPaintings } = usePaintings();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
 
@@ -34,6 +34,8 @@ export default function CheckoutSuccessPage({
       transaction_id: sessionId,
       currency: "CAD",
     });
+
+    localStorage.removeItem("checkout_session_id");
   }, [sessionId]);
 
   return (

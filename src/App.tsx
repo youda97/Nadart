@@ -7,8 +7,9 @@ import AddedToCartModal from "./modals/AddedToCartModal";
 import ScrollToTop from "./components/ScrollToTop";
 import AppErrorBoundary from "./components/AppErrorBoundary";
 import GoogleAnalyticsPageview from "./components/GoogleAnalyticsPageview";
-import type { Painting } from "./types/painting";
+import { PaintingsProvider } from "./hooks/PaintingsProvider";
 import { trackEvent, paintingToGAItem } from "./lib/ga";
+import type { Painting } from "./types/painting";
 
 import HomePage from "./pages/HomePage";
 const CollectionPage = lazy(() => import("./pages/CollectionPage"));
@@ -55,34 +56,23 @@ function AppContent() {
 
   const [quickView, setQuickView] = useState<Painting | null>(null);
   const [addedToCartItem, setAddedToCartItem] = useState<Painting | null>(null);
-  const [paintings, setPaintings] = useState<Painting[]>([]);
-  const [paintingsLoading, setPaintingsLoading] = useState(true);
-
-  const fetchPaintings = useCallback(async () => {
-    try {
-      setPaintingsLoading(true);
-
-      const res = await fetch("/api/paintings");
-      const data = await res.json();
-
-      setPaintings(data);
-    } catch (error) {
-      console.error("Failed to fetch paintings:", error);
-    } finally {
-      setPaintingsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchPaintings();
-  }, [fetchPaintings]);
 
   useEffect(() => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
   }, [cart]);
 
+  const handleQuickView = (painting: Painting) => {
+    trackEvent("view_item", {
+      currency: "CAD",
+      value: painting.price,
+      items: [paintingToGAItem(painting)],
+    });
+
+    setQuickView(painting);
+  };
+
   const addToCart = (painting: Painting) => {
-    if (painting.sold) {
+    if (painting.sold || painting.isReserved) {
       return;
     }
 
@@ -90,6 +80,7 @@ function AppContent() {
 
     setCart((prev) => {
       const alreadyInCart = prev.some((item) => item.id === painting.id);
+
       if (alreadyInCart) {
         return prev;
       }
@@ -112,20 +103,26 @@ function AppContent() {
 
   const removeFromCart = (id: string) => {
     setCart((prev) => {
-      const index = prev.findIndex((item) => item.id === id);
+      const item = prev.find((p) => p.id === id);
 
-      if (index === -1) {
+      if (!item) {
         return prev;
       }
 
-      return prev.filter((_, i) => i !== index);
+      trackEvent("remove_from_cart", {
+        currency: "CAD",
+        value: item.price,
+        items: [paintingToGAItem(item)],
+      });
+
+      return prev.filter((p) => p.id !== id);
     });
   };
 
-  const clearCart = useCallback(() => {
+  const clearCart = () => {
     setCart([]);
     localStorage.removeItem(CART_STORAGE_KEY);
-  }, []);
+  };
 
   return (
     <>
@@ -139,10 +136,8 @@ function AppContent() {
               index
               element={
                 <HomePage
-                  onQuickView={setQuickView}
+                  onQuickView={handleQuickView}
                   onAddToCart={addToCart}
-                  paintings={paintings}
-                  paintingsLoading={paintingsLoading}
                 />
               }
             />
@@ -150,31 +145,18 @@ function AppContent() {
               path="collection"
               element={
                 <CollectionPage
-                  onQuickView={setQuickView}
+                  onQuickView={handleQuickView}
                   onAddToCart={addToCart}
-                  paintings={paintings}
-                  paintingsLoading={paintingsLoading}
                 />
               }
             />
             <Route
               path="cart"
-              element={
-                <CartPage
-                  cart={cart}
-                  onRemove={removeFromCart}
-                  refetchPaintings={fetchPaintings}
-                />
-              }
+              element={<CartPage cart={cart} onRemove={removeFromCart} />}
             />
             <Route
               path="checkout/success"
-              element={
-                <CheckoutSuccessPage
-                  clearCart={clearCart}
-                  refetchPaintings={fetchPaintings}
-                />
-              }
+              element={<CheckoutSuccessPage clearCart={clearCart} />}
             />
             <Route path="inquiry-success" element={<InquirySuccessPage />} />
             <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
@@ -214,7 +196,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AppErrorBoundary>
-        <AppContent />
+        <PaintingsProvider>
+          <AppContent />
+        </PaintingsProvider>
       </AppErrorBoundary>
     </BrowserRouter>
   );

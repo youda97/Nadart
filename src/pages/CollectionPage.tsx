@@ -3,20 +3,18 @@ import { Link } from "react-router-dom";
 import ShelfRow from "../components/ShelfRow";
 import PaintingCard from "../components/PaintingCard";
 import type { Painting } from "../types/painting";
+import { usePaintings } from "../hooks/usePaintings";
 
 type CollectionPageProps = {
   onQuickView: (painting: Painting) => void;
   onAddToCart: (painting: Painting) => void;
-  paintings: Painting[];
-  paintingsLoading: boolean;
 };
 
 export default function CollectionPage({
   onQuickView,
   onAddToCart,
-  paintings,
-  paintingsLoading,
 }: CollectionPageProps) {
+  const { paintings, paintingsLoading } = usePaintings();
   const [page, setPage] = useState(1);
 
   const perPage = 9;
