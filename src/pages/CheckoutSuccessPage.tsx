@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
+import { trackEvent } from "../lib/ga";
 
 type CheckoutSuccessPageProps = {
   clearCart: () => void;
@@ -25,6 +26,15 @@ export default function CheckoutSuccessPage({
     clearCart();
     hasClearedRef.current = true;
   }, [clearCart]);
+
+  useEffect(() => {
+    if (!sessionId) return;
+
+    trackEvent("purchase", {
+      transaction_id: sessionId,
+      currency: "CAD",
+    });
+  }, [sessionId]);
 
   return (
     <div className="min-h-screen bg-[#f8f3eb] pt-28">

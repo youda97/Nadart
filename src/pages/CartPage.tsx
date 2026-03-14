@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { formatPrice } from "../lib/format";
 import type { Painting } from "../types/painting";
 import { createCheckoutSession } from "../api/checkout";
+import { trackEvent, paintingToGAItem } from "../lib/ga";
 
 type CartPageProps = {
   cart: Painting[];
@@ -24,12 +25,19 @@ export default function CartPage({
   const wasCancelled = searchParams.get("cancelled") === "true";
   const hasUnavailableItems = cart.some((item) => item.sold || item.isReserved);
   const hasReleasedRef = useRef(false);
+  const hasTrackedViewCartRef = useRef(false);
 
   async function handleCheckout() {
     try {
       setIsCheckingOut(true);
 
       const session = await createCheckoutSession(cart, shippingCountry);
+
+      trackEvent("begin_checkout", {
+        currency: "CAD",
+        value: total,
+        items: cart.map((item) => paintingToGAItem(item)),
+      });
 
       // store session id
       localStorage.setItem("checkout_session_id", session.id);
@@ -47,6 +55,18 @@ export default function CartPage({
   useEffect(() => {
     refetchPaintings();
   }, [refetchPaintings]);
+
+  useEffect(() => {
+    if (hasTrackedViewCartRef.current || cart.length === 0) return;
+
+    trackEvent("view_cart", {
+      currency: "CAD",
+      value: total,
+      items: cart.map((item) => paintingToGAItem(item)),
+    });
+
+    hasTrackedViewCartRef.current = true;
+  }, [cart, total]);
 
   useEffect(() => {
     fetch("https://ipapi.co/json/")

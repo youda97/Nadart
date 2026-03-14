@@ -6,7 +6,9 @@ import QuickViewModal from "./modals/QuickViewModal";
 import AddedToCartModal from "./modals/AddedToCartModal";
 import ScrollToTop from "./components/ScrollToTop";
 import AppErrorBoundary from "./components/AppErrorBoundary";
+import GoogleAnalyticsPageview from "./components/GoogleAnalyticsPageview";
 import type { Painting } from "./types/painting";
+import { trackEvent, paintingToGAItem } from "./lib/ga";
 
 import HomePage from "./pages/HomePage";
 const CollectionPage = lazy(() => import("./pages/CollectionPage"));
@@ -84,13 +86,25 @@ function AppContent() {
       return;
     }
 
+    let wasAdded = false;
+
     setCart((prev) => {
       const alreadyInCart = prev.some((item) => item.id === painting.id);
       if (alreadyInCart) {
         return prev;
       }
+
+      wasAdded = true;
       return [...prev, painting];
     });
+
+    if (wasAdded) {
+      trackEvent("add_to_cart", {
+        currency: "CAD",
+        value: painting.price,
+        items: [paintingToGAItem(painting)],
+      });
+    }
 
     setQuickView(null);
     setAddedToCartItem(painting);
@@ -115,6 +129,7 @@ function AppContent() {
 
   return (
     <>
+      <GoogleAnalyticsPageview />
       <ScrollToTop />
 
       <Suspense fallback={<PageLoader />}>
