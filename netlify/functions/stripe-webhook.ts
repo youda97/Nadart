@@ -68,6 +68,29 @@ export const handler: Handler = async (event) => {
           amountTotal: session.amount_total,
         });
 
+        const { data: existingOrder, error: existingOrderError } =
+          await supabase
+            .from("orders")
+            .select("id")
+            .eq("stripe_session_id", session.id)
+            .maybeSingle();
+
+        if (existingOrderError) {
+          console.error("Existing order lookup failed:", existingOrderError);
+          throw new Error(existingOrderError.message);
+        }
+
+        if (existingOrder) {
+          console.log(
+            "Order already exists for this Stripe session, skipping",
+            {
+              sessionId: session.id,
+              orderId: existingOrder.id,
+            },
+          );
+          break;
+        }
+
         const { data: order, error: orderError } = await supabase
           .from("orders")
           .insert({
@@ -84,6 +107,39 @@ export const handler: Handler = async (event) => {
         }
 
         for (const paintingId of paintingIds) {
+          const { data: updatedRows, error: updatePaintingError } =
+            await supabase
+              .from("paintings")
+              .update({
+                sold: true,
+                sold_to_email: customerEmail,
+                sold_at: new Date().toISOString(),
+                reserved_until: null,
+                reserved_session_id: null,
+              })
+              .eq("id", paintingId)
+              .eq("reserved_session_id", session.id)
+              .eq("sold", false)
+              .select("id,title");
+
+          console.log("Painting sale update result", {
+            sessionId: session.id,
+            paintingId,
+            updatedRows,
+            updatePaintingError,
+          });
+
+          if (updatePaintingError) {
+            console.error("Painting update failed:", updatePaintingError);
+            throw new Error(updatePaintingError.message);
+          }
+
+          if (!updatedRows || updatedRows.length === 0) {
+            throw new Error(
+              `Painting ${paintingId} was no longer reserved for this checkout session.`,
+            );
+          }
+
           const { error: orderItemError } = await supabase
             .from("order_items")
             .insert({
@@ -94,22 +150,6 @@ export const handler: Handler = async (event) => {
           if (orderItemError) {
             console.error("Order item insert failed:", orderItemError);
             throw new Error(orderItemError.message);
-          }
-
-          const { error: updatePaintingError } = await supabase
-            .from("paintings")
-            .update({
-              sold: true,
-              sold_to_email: customerEmail,
-              sold_at: new Date().toISOString(),
-              reserved_until: null,
-              reserved_session_id: null,
-            })
-            .eq("id", paintingId);
-
-          if (updatePaintingError) {
-            console.error("Painting update failed:", updatePaintingError);
-            throw new Error(updatePaintingError.message);
           }
         }
 
@@ -137,7 +177,7 @@ export const handler: Handler = async (event) => {
             })
             .in("id", paintingIds)
             .eq("reserved_session_id", session.id)
-            .select("id, reserved_session_id, reserved_until");
+            .select("id,reserved_session_id,reserved_until");
 
           console.log("Expired checkout release result", {
             sessionId: session.id,

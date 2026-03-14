@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import type { Handler } from "@netlify/functions";
 import { stripe } from "./_lib/stripe";
 import { noContent } from "./_lib/cors";
@@ -60,7 +61,11 @@ export const handler: Handler = async (event) => {
       throw new Error(paintingsError?.message || "Failed to fetch paintings");
     }
 
-    const unavailable = (paintings || []).find(
+    if (paintings.length !== ids.length) {
+      throw new Error("One or more paintings could not be found.");
+    }
+
+    const unavailable = paintings.find(
       (p) =>
         p.sold ||
         (p.reserved_until &&
@@ -71,13 +76,18 @@ export const handler: Handler = async (event) => {
       throw new Error(`${unavailable.title} is no longer available.`);
     }
 
+    console.log("Attempting reservation lock", {
+      ids,
+      reservationToken,
+      reserveUntil,
+    });
+
     /**
      * Atomic reservation lock
      * Only reserve paintings that are:
      * - not sold
      * - not actively reserved
      */
-
     const { data: reservedRows, error: reserveError } = await supabase
       .from("paintings")
       .update({
@@ -87,11 +97,18 @@ export const handler: Handler = async (event) => {
       .in("id", ids)
       .eq("sold", false)
       .or(`reserved_until.is.null,reserved_until.lte.${nowIso}`)
-      .select("id,title");
+      .select("id,title,reserved_session_id,reserved_until");
 
     if (reserveError) {
+      console.error("Reservation lock failed", reserveError);
       throw new Error(reserveError.message);
     }
+
+    console.log("Reservation lock result", {
+      reservedRows,
+      reservedCount: reservedRows?.length ?? 0,
+      expectedCount: ids.length,
+    });
 
     if (!reservedRows || reservedRows.length !== ids.length) {
       throw new Error("One or more paintings are no longer available.");
@@ -108,7 +125,7 @@ export const handler: Handler = async (event) => {
         quantity: item.quantity,
         price_data: {
           currency: "cad",
-          unit_amount: Math.round(painting.price * 100),
+          unit_amount: Math.round(Number(painting.price) * 100),
           product_data: {
             name: painting.title,
             images: [`${siteUrl}${painting.image}`],
@@ -166,18 +183,26 @@ export const handler: Handler = async (event) => {
         },
       });
     } catch (stripeError) {
+      console.error("Stripe checkout session creation failed", stripeError);
+
       /**
        * Release reservation if Stripe fails
        */
-
-      await supabase
+      const { data: releasedRows, error: releaseError } = await supabase
         .from("paintings")
         .update({
           reserved_until: null,
           reserved_session_id: null,
         })
         .in("id", ids)
-        .eq("reserved_session_id", reservationToken);
+        .eq("reserved_session_id", reservationToken)
+        .select("id");
+
+      console.log("Released reservation after Stripe failure", {
+        reservationToken,
+        releasedRows,
+        releaseError,
+      });
 
       throw stripeError;
     }
@@ -185,7 +210,6 @@ export const handler: Handler = async (event) => {
     /**
      * Replace reservation token with actual Stripe session id
      */
-
     const { data: swappedRows, error: swapError } = await supabase
       .from("paintings")
       .update({
@@ -193,26 +217,22 @@ export const handler: Handler = async (event) => {
       })
       .in("id", ids)
       .eq("reserved_session_id", reservationToken)
-      .select("id, reserved_session_id");
+      .select("id,reserved_session_id");
 
-    if (swapError) {
-      console.error(
-        "Failed to replace reservation token with Stripe session id",
-        {
-          reservationToken,
-          stripeSessionId: session.id,
-          swapError,
-        },
-      );
-
-      throw new Error(swapError.message);
-    }
-
-    console.log("Reservation token swapped to Stripe session id", {
+    console.log("Reservation token swap result", {
       reservationToken,
       stripeSessionId: session.id,
       swappedRows,
+      swapError,
     });
+
+    if (swapError) {
+      throw new Error(swapError.message);
+    }
+
+    if (!swappedRows || swappedRows.length !== ids.length) {
+      throw new Error("Failed to attach Stripe session to reserved paintings.");
+    }
 
     return {
       statusCode: 200,
@@ -222,6 +242,8 @@ export const handler: Handler = async (event) => {
       }),
     };
   } catch (error) {
+    console.error("Create checkout session failed:", error);
+
     return {
       statusCode: 500,
       body: JSON.stringify({
