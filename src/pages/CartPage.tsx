@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { formatPrice } from "../lib/format";
 import type { Painting } from "../types/painting";
 import { createCheckoutSession } from "../api/checkout";
+import { trackEvent } from "../lib/plausible";
 
 type CartPageProps = {
   cart: Painting[];
@@ -24,12 +25,19 @@ export default function CartPage({
   const wasCancelled = searchParams.get("cancelled") === "true";
   const hasUnavailableItems = cart.some((item) => item.sold || item.isReserved);
   const hasReleasedRef = useRef(false);
+  const hasTrackedCancelledRef = useRef(false);
 
   async function handleCheckout() {
     try {
       setIsCheckingOut(true);
 
       const session = await createCheckoutSession(cart, shippingCountry);
+
+      trackEvent("CheckoutStart", {
+        itemCount: cart.length,
+        total: total,
+        shippingCountry,
+      });
 
       // store session id
       localStorage.setItem("checkout_session_id", session.id);
@@ -47,6 +55,17 @@ export default function CartPage({
   useEffect(() => {
     refetchPaintings();
   }, [refetchPaintings]);
+
+  useEffect(() => {
+    if (!wasCancelled || hasTrackedCancelledRef.current) return;
+
+    trackEvent("CheckoutCancelled", {
+      itemCount: cart.length,
+      total,
+    });
+
+    hasTrackedCancelledRef.current = true;
+  }, [wasCancelled, cart.length, total]);
 
   useEffect(() => {
     fetch("https://ipapi.co/json/")

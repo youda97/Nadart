@@ -1,6 +1,12 @@
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { trackEvent } from "../lib/plausible";
 
 export default function InquirySuccessPage() {
+  useEffect(() => {
+    trackEvent("InquirySubmitted");
+  }, []);
+
   return (
     <section className="relative overflow-hidden bg-[url('/textures/content-bg.webp')] pb-28 pt-[calc(77px+7rem)]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(199,155,78,0.18),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(168,121,55,0.14),_transparent_28%)]" />
