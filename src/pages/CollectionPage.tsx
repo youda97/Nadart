@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import ShelfRow from "../components/ShelfRow";
 import PaintingCard from "../components/PaintingCard";
@@ -20,22 +20,18 @@ export default function CollectionPage({
   const perPage = 9;
   const totalPages = Math.ceil(paintings.length / perPage);
 
-  const pageItems = useMemo(() => {
-    const start = (page - 1) * perPage;
-    return paintings.slice(start, start + perPage);
-  }, [page, paintings]);
+  const start = (page - 1) * perPage;
 
-  const rows = useMemo(() => {
-    const grouped: Painting[][] = [];
-    for (let i = 0; i < pageItems.length; i += 3) {
-      grouped.push(pageItems.slice(i, i + 3));
-    }
-    return grouped;
-  }, [pageItems]);
+  const pageItems = paintings.slice(start, start + perPage);
 
-  const loadingPlaceholders = useMemo(
-    () => Array.from({ length: 3 }, (_, index) => `loading-${index}`),
-    [],
+  const rows = [];
+  for (let i = 0; i < pageItems.length; i += 3) {
+    rows.push(pageItems.slice(i, i + 3));
+  }
+
+  const loadingPlaceholders = Array.from(
+    { length: 3 },
+    (_, i) => `loading-${i}`,
   );
 
   return (

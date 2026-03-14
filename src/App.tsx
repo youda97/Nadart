@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout";

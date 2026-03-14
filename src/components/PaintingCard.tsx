@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ShoppingCart, Search } from "lucide-react";
 import { formatPrice } from "../lib/format";
+import ReservedCountdown from "./ReservedCountdown";
 import type { Painting } from "../types/painting";
 
 type PaintingCardProps = {
@@ -51,8 +52,11 @@ export default function PaintingCard({
             Sold
           </div>
         ) : painting.isReserved ? (
-          <div className="absolute -left-6 -bottom-6 z-20 bg-amber-500 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white">
-            Reserved <br /> (Someone is checking out)
+          <div className="absolute -left-6 -bottom-6 z-20 bg-amber-500 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow-md">
+            <div>Reserved</div>
+            <ReservedCountdown
+              reservedUntil={painting.reserved_until ?? null}
+            />
           </div>
         ) : null}
 
