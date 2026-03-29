@@ -116,7 +116,7 @@ export default function CartPage({ cart, onRemove }: CartPageProps) {
   return (
     <div className="min-h-screen bg-[#f6f6f4] pt-28">
       <div className="mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-center justify-between gap-4">
+        <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-3xl font-bold text-stone-900 md:text-4xl">
             Your Cart
           </h1>
