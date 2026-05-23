@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
-import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import AnnouncementBanner from "../components/AnnouncementBanner";
 
 type MainLayoutProps = {
   cartCount: number;
@@ -9,6 +10,7 @@ type MainLayoutProps = {
 export default function MainLayout({ cartCount }: MainLayoutProps) {
   return (
     <div className="min-h-screen bg-white text-stone-900">
+      <AnnouncementBanner />
       <Navbar cartCount={cartCount} />
       <Outlet />
       <Footer />

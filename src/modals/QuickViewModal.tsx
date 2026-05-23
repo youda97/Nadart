@@ -85,7 +85,7 @@ export default function QuickViewModal({
 
             {painting.sold ? (
               <div className="mt-8 inline-flex bg-stone-900 px-8 py-4 text-xl font-medium text-white">
-                Sold
+                {painting.is_auction_item ? "Auctioned" : "Sold"}
               </div>
             ) : (
               <button

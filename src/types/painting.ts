@@ -8,6 +8,7 @@ export type Painting = {
   size_height: number;
   category?: string;
   sold: boolean;
+  is_auction_item?: boolean;
   reserved_until?: string | null;
   isReserved: boolean;
   created_at: string;

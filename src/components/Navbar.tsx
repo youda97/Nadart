@@ -8,7 +8,7 @@ type NavbarProps = {
 
 export default function Navbar({ cartCount }: NavbarProps) {
   return (
-    <header className="fixed left-0 top-0 z-40 w-full border-b border-white/10 bg-[#f8f1e7]/75 backdrop-blur-md">
+    <header className="fixed left-0 top-10 z-40 w-full border-b border-white/10 bg-white/75 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <Link to="/">
           <Logo />
