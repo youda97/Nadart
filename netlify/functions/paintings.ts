@@ -33,6 +33,7 @@ export const handler: Handler = async () => {
       image: painting.image,
       category: painting.category ?? "",
       sold: painting.sold ?? false,
+      is_auction_item: painting.is_auction_item ?? false,
       reserved_until: painting.reserved_until
         ? new Date(painting.reserved_until).toISOString()
         : null,
