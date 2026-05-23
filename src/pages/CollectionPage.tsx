@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import ShelfRow from "../components/ShelfRow";
 import PaintingCard from "../components/PaintingCard";
@@ -17,6 +17,8 @@ export default function CollectionPage({
   const { paintings, paintingsLoading } = usePaintings();
   const [page, setPage] = useState(1);
 
+  const collectionTopRef = useRef<HTMLDivElement | null>(null);
+
   const perPage = 9;
   const totalPages = Math.ceil(paintings.length / perPage);
 
@@ -34,6 +36,17 @@ export default function CollectionPage({
     (_, i) => `loading-${i}`,
   );
 
+  function handlePageChange(page: number) {
+    setPage(page);
+
+    setTimeout(() => {
+      collectionTopRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 0);
+  }
+
   return (
     <div className="min-h-screen bg-[#f6f6f4] pt-19">
       <div className="border-b border-stone-200 bg-white">
@@ -46,7 +59,7 @@ export default function CollectionPage({
         </div>
       </div>
 
-      <section className="py-10 md:py-14">
+      <section ref={collectionTopRef} className="py-10 md:py-14 scroll-mt-40">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 text-center">
             <div className="mb-4 inline-flex items-center gap-4">
@@ -109,7 +122,7 @@ export default function CollectionPage({
               {totalPages > 1 ? (
                 <div className="mt-10 flex items-center justify-center gap-2">
                   <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    onClick={() => handlePageChange(Math.max(1, page - 1))}
                     className="h-8 w-8 bg-[#b99a64] text-white disabled:opacity-40"
                     disabled={page === 1}
                   >
@@ -120,7 +133,7 @@ export default function CollectionPage({
                     (pageNum) => (
                       <button
                         key={pageNum}
-                        onClick={() => setPage(pageNum)}
+                        onClick={() => handlePageChange(pageNum)}
                         className={`h-8 w-8 border text-sm ${
                           page === pageNum
                             ? "border-[#b99a64] bg-white text-stone-900"
@@ -133,7 +146,9 @@ export default function CollectionPage({
                   )}
 
                   <button
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    onClick={() =>
+                      handlePageChange(Math.min(totalPages, page + 1))
+                    }
                     className="h-8 w-8 bg-[#b99a64] text-white disabled:opacity-40"
                     disabled={page === totalPages}
                   >
