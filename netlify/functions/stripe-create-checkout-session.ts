@@ -48,7 +48,16 @@ export const handler: Handler = async (event) => {
     const now = new Date();
     const nowIso = now.toISOString();
 
-    const reserveUntil = new Date(now.getTime() + 30 * 60 * 1000).toISOString();
+    const RESERVATION_MINUTES = 5;
+    const STRIPE_SESSION_MINUTES = 30;
+
+    const reserveUntil = new Date(
+      now.getTime() + RESERVATION_MINUTES * 60 * 1000,
+    ).toISOString();
+
+    const stripeExpiresAt = new Date(
+      now.getTime() + STRIPE_SESSION_MINUTES * 60 * 1000,
+    ).toISOString();
 
     const reservationToken = crypto.randomUUID();
 
@@ -174,7 +183,7 @@ export const handler: Handler = async (event) => {
           enabled: true,
         },
 
-        expires_at: Math.floor(new Date(reserveUntil).getTime() / 1000),
+        expires_at: Math.floor(new Date(stripeExpiresAt).getTime() / 1000),
 
         metadata: {
           source: "nadart-site",

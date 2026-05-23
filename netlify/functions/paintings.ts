@@ -2,6 +2,17 @@ import type { Handler } from "@netlify/functions";
 import { supabase } from "./_lib/supabase";
 
 export const handler: Handler = async () => {
+  // Clear expired reservations whenever paintings are fetched.
+  await supabase
+    .from("paintings")
+    .update({
+      reserved_until: null,
+      reserved_session_id: null,
+    })
+    .not("reserved_until", "is", null)
+    .lt("reserved_until", new Date().toISOString())
+    .eq("sold", false);
+
   const { data, error } = await supabase
     .from("paintings")
     .select("*")

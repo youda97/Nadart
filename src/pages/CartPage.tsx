@@ -79,28 +79,32 @@ export default function CartPage({ cart, onRemove }: CartPageProps) {
   }, [wasCancelled, total]);
 
   useEffect(() => {
-    if (!wasCancelled || hasReleasedRef.current) return;
+    if (!wasCancelled || hasReleasedRef.current) {
+      return;
+    }
 
     const sessionId = localStorage.getItem("checkout_session_id");
-    if (!sessionId) return;
+
+    if (!sessionId) {
+      return;
+    }
 
     hasReleasedRef.current = true;
 
-    fetch("/api/release-reservation", {
+    fetch("/api/expire-checkout-session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        sessionId,
-      }),
+      body: JSON.stringify({ sessionId }),
     })
-      .then(() => refetchPaintings())
+      .then(() => {
+        refetchPaintings();
+        localStorage.removeItem("checkout_session_id");
+      })
       .catch((error) => {
-        console.error("Failed to release reservation", error);
+        console.error("Failed to expire checkout session", error);
       });
-
-    localStorage.removeItem("checkout_session_id");
   }, [wasCancelled, refetchPaintings]);
 
   useEffect(() => {

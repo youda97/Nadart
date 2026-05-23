@@ -8,6 +8,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import AppErrorBoundary from "./components/AppErrorBoundary";
 import GoogleAnalyticsPageview from "./components/GoogleAnalyticsPageview";
 import { PaintingsProvider } from "./hooks/PaintingsProvider";
+import { useCleanupAbandonedCheckout } from "./hooks/useCleanupAbandonedCheckout";
 import { trackEvent, paintingToGAItem } from "./lib/ga";
 import type { Painting } from "./types/painting";
 
@@ -193,6 +194,8 @@ function AppContent() {
 }
 
 export default function App() {
+  useCleanupAbandonedCheckout();
+
   return (
     <BrowserRouter>
       <AppErrorBoundary>

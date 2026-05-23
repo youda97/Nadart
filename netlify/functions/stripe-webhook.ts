@@ -135,9 +135,28 @@ export const handler: Handler = async (event) => {
           }
 
           if (!updatedRows || updatedRows.length === 0) {
-            throw new Error(
-              `Painting ${paintingId} was no longer reserved for this checkout session.`,
+            console.warn(
+              "Painting was no longer reserved for this checkout session",
+              {
+                sessionId: session.id,
+                paintingId,
+              },
             );
+
+            if (typeof session.payment_intent === "string") {
+              await stripe.refunds.create({
+                payment_intent: session.payment_intent,
+                reason: "requested_by_customer",
+                metadata: {
+                  source: "nadart-auto-refund",
+                  reason: "reservation_expired_or_unavailable",
+                  paintingId,
+                  checkoutSessionId: session.id,
+                },
+              });
+            }
+
+            break;
           }
 
           const { error: orderItemError } = await supabase
