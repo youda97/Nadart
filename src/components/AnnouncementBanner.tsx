@@ -10,7 +10,7 @@ export default function AnnouncementBanner() {
           <span className="font-semibold text-[#c2a476]">
             Art with purpose —
           </span>{" "}
-          10% of every purchase supports Gaza relief efforts.
+          10% of every purchase supports relief efforts across Palestine.
         </span>
       </div>
     </div>
