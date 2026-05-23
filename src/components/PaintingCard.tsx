@@ -49,7 +49,7 @@ export default function PaintingCard({
       <div className="relative z-10 overflow-visible border-[18px] border-black bg-[#f0e9e3] shadow-[0_12px_28px_rgba(0,0,0,0.18)]">
         {painting.sold ? (
           <div className="absolute -right-8 -top-8 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[#ccb183] text-[11px] font-semibold uppercase tracking-[0.16em] text-white shadow-lg">
-            {painting.is_auction_item ? "Auctioned" : "Sold"}
+            {painting.is_auction_item ? "Won" : "Sold"}
           </div>
         ) : painting.isReserved ? (
           <div className="absolute -left-6 -bottom-6 z-20 bg-amber-500 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow-md">
