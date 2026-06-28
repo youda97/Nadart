@@ -38,7 +38,7 @@ export default function AddedToCartModal({
         <X className="h-6 w-6 sm:h-8 sm:w-8" />
       </button>
 
-      <div className="mx-auto grid min-h-dvh w-full max-w-6xl grid-cols-1 items-start lg:gap-8 gap-0 pt-18 pb-8 sm:min-h-screen sm:items-center sm:pt-0 lg:grid-cols-[1fr_320px]">
+      <div className="mx-auto grid min-h-dvh w-full max-w-6xl grid-cols-1 items-start gap-8 pt-18 pb-8 sm:min-h-screen sm:items-center sm:pt-0 lg:grid-cols-[1fr_320px]">
         <div>
           <div className="mb-8 md:mt-6 flex items-center gap-4 text-white">
             <CheckCircle2 className="h-10 w-10" />
